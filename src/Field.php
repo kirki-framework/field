@@ -63,6 +63,45 @@ abstract class Field {
 
 		// Add customizer control.
 		add_action( 'customize_register', [ $this, 'add_control' ] );
+
+		// Add default filters. Can be overriden in child classes.
+		add_filter( 'kirki_field_add_setting_args', [ $this, 'filter_setting_args' ], 10, 2 );
+		add_filter( 'kirki_field_add_control_args', [ $this, 'filter_control_args' ], 10, 2 );
+	}
+
+	/**
+	 * Filter setting args.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param array                $args         The field arguments.
+	 * @param WP_Customize_Manager $wp_customize The customizer instance.
+	 * @return array
+	 */
+	public function filter_setting_args( $args, $wp_customize ) {
+		$args['type'] = 'theme_mod';
+		if ( isset( $args['option_type'] ) ) {
+			$args['type'] = $args['option_type'];
+			if ( isset( $args['option_name'] ) ) {
+				if ( isset( $args['settings'] ) && false === strpos( $args['settings'], $args['option_name'] . '[' ) ) {
+					$args['settings'] = $args['option_name'] . '[' . $args['settings'] . ']';
+				}
+			}
+		}
+		return $args;
+	}
+
+	/**
+	 * Filter control args.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param array                $args         The field arguments.
+	 * @param WP_Customize_Manager $wp_customize The customizer instance.
+	 * @return array
+	 */
+	public function filter_control_args( $args, $wp_customize ) {
+		return $args;
 	}
 
 	/**
