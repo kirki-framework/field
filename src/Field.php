@@ -1,0 +1,120 @@
+<?php
+/**
+ * WordPress Customizer API abstraction.
+ *
+ * @package   kirki-framework/field
+ * @copyright Copyright (c) 2019, Ari Stathopoulos (@aristath)
+ * @license   https://opensource.org/licenses/MIT
+ * @since     0.1
+ */
+
+namespace Kirki;
+
+/**
+ * Make it easier to create customizer settings & controls with a single call,
+ * register the control type if needed, run extra actions the the customizer.
+ * This is a simple abstraction which makes adding simple controls to the Customizer.
+ *
+ * This class is not meant to be used as-is, you'll need to extend it from a child class.
+ *
+ * @since 0.1
+ */
+abstract class Field {
+
+	/**
+	 * The field arguments.
+	 *
+	 * @access protected
+	 * @since 0.1
+	 * @var array
+	 */
+	protected $args;
+
+	/**
+	 * The control class-name.
+	 * 
+	 * Use the full classname, with namespace included.
+	 * Example: '\Kirki\Control\Color'.
+	 *
+	 * @access protected
+	 * @since 0.1
+	 * @var string
+	 */
+	protected $control_class;
+
+	/**
+	 * Constructor.
+	 * Registers any hooks we need to run.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param array $args The field arguments.
+	 */
+	public function __construct( $args ) {
+
+		// Set the arguments in this object.
+		$this->args = $args;
+
+		// The "kirki_field_init" hook.
+		do_action( 'kirki_field_init', $this->args );
+
+		// Add customizer setting.
+		add_action( 'customize_register', [ $this, 'add_setting' ] );
+
+		// Add customizer control.
+		add_action( 'customize_register', [ $this, 'add_control' ] );
+	}
+
+	/**
+	 * Registers the setting.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param WP_Customize_Manager $wp_customize The customizer instance.
+	 * @return void
+	 */
+	public function add_setting( $wp_customize ) {
+
+		/**
+		 * Allow filtering the arguments.
+		 *
+		 * @since 0.1
+		 * @param array                $this->args   The arguments.
+		 * @param WP_Customize_Manager $wp_customize The customizer instance.
+		 * @return array                             Return the arguments.
+		 */
+		$args = apply_filters( 'kirki_field_add_setting_args', $this->args, $wp_customize );
+		if ( isset( $args['settings'] ) ) {
+			$wp_customize->add_setting( $args['settings'], $args );
+		}
+	}
+
+	/**
+	 * Registers the control.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param WP_Customize_Manager $wp_customize The customizer instance.
+	 * @return void
+	 */
+	public function add_control( $wp_customize ) {
+
+		$control_class = $this->control_class;
+
+		// If no class-name is defined, early exit.
+		if ( ! $control_class ) {
+			return;
+		}
+
+		/**
+		 * Allow filtering the arguments.
+		 *
+		 * @since 0.1
+		 * @param array                $this->args   The arguments.
+		 * @param WP_Customize_Manager $wp_customize The customizer instance.
+		 * @return array                             Return the arguments.
+		 */
+		$args = apply_filters( 'kirki_field_add_control_args', $this->args, $wp_customize );
+		$wp_customize->add_control( new $control_class( $wp_customize, $args['settings'], $args ) );
+	}
+}
