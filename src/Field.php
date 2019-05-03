@@ -67,6 +67,8 @@ abstract class Field {
 		// The "kirki_field_init" hook.
 		do_action( 'kirki_field_init', $this->args );
 
+		$this->init( $this->args );
+
 		// Register control-type for JS-templating in the customizer.
 		add_action( 'customize_register', [ $this, 'register_control_type' ] );
 
@@ -82,6 +84,16 @@ abstract class Field {
 	}
 
 	/**
+	 * Runs in the constructor. Can be used by child-classes to define extra logic.
+	 *
+	 * @access protected
+	 * @since 0.1
+	 * @param array $args The field arguments.
+	 * @return void
+	 */
+	protected function init( $args ) {}
+
+	/**
 	 * Register the control-type.
 	 *
 	 * @access public
@@ -90,7 +102,9 @@ abstract class Field {
 	 * @return array
 	 */
 	public function register_control_type( $wp_customize ) {
-		$wp_customize->register_control_type( $this->control_class );
+		if ( $this->control_class ) {
+			$wp_customize->register_control_type( $this->control_class );
+		}
 	}
 
 	/**
