@@ -106,7 +106,7 @@ abstract class Field {
 		$args['type'] = 'theme_mod';
 		if ( isset( $args['option_type'] ) ) {
 			$args['type'] = $args['option_type'];
-			if ( isset( $args['option_name'] ) ) {
+			if ( isset( $args['option_name'] ) && ! empty( $args['option_name'] ) ) {
 				if ( isset( $args['settings'] ) && false === strpos( $args['settings'], $args['option_name'] . '[' ) ) {
 					$args['settings'] = $args['option_name'] . '[' . $args['settings'] . ']';
 				}
