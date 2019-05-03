@@ -43,6 +43,15 @@ abstract class Field {
 	protected $control_class;
 
 	/**
+	 * Whether we should register the control class for JS-templating or not.
+	 *
+	 * @access protected
+	 * @since 0.1
+	 * @var bool
+	 */
+	protected $control_has_js_template = false;
+
+	/**
 	 * Constructor.
 	 * Registers any hooks we need to run.
 	 *
@@ -58,6 +67,9 @@ abstract class Field {
 		// The "kirki_field_init" hook.
 		do_action( 'kirki_field_init', $this->args );
 
+		// Register control-type for JS-templating in the customizer.
+		add_action( 'customize_register', [ $this, 'register_control_type' ] );
+
 		// Add customizer setting.
 		add_action( 'customize_register', [ $this, 'add_setting' ] );
 
@@ -67,6 +79,18 @@ abstract class Field {
 		// Add default filters. Can be overriden in child classes.
 		add_filter( 'kirki_field_add_setting_args', [ $this, 'filter_setting_args' ], 10, 2 );
 		add_filter( 'kirki_field_add_control_args', [ $this, 'filter_control_args' ], 10, 2 );
+	}
+
+	/**
+	 * Register the control-type.
+	 *
+	 * @access public
+	 * @since 0.1
+	 * @param WP_Customize_Manager $wp_customize The customizer instance.
+	 * @return array
+	 */
+	public function register_control_type( $wp_customize ) {
+		$wp_customize->register_control_type( $this->control_class );
 	}
 
 	/**
