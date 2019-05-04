@@ -64,8 +64,12 @@ abstract class Field {
 		// Set the arguments in this object.
 		$this->args = $args;
 
-		// The "kirki_field_init" hook.
-		do_action( 'kirki_field_init', $this->args );
+		add_action( 'init', function() {
+			do_action( 'kirki_field_init', $this->args );
+		} );
+		add_action( 'wp', function() {
+			do_action( 'kirki_field_wp', $this->args );
+		} );
 
 		$this->init( $this->args );
 
