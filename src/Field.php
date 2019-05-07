@@ -64,6 +64,10 @@ abstract class Field {
 		// Set the arguments in this object.
 		$this->args = $args;
 
+		if ( ! isset( $this->args['settings'] ) ) {
+			$this->args['settings'] = md5( wp_json_encode( $this->args ) );
+		}
+
 		add_action(
 			'init',
 			function() {
@@ -202,7 +206,6 @@ abstract class Field {
 		 * @return array                             Return the arguments.
 		 */
 		$args = apply_filters( 'kirki_field_add_control_args', $this->args, $wp_customize );
-		$id   = isset( $args['settings'] ) ? $args['settings'] : md5( wp_json_encode( $args ) );
-		$wp_customize->add_control( new $control_class( $wp_customize, $id, $args ) );
+		$wp_customize->add_control( new $control_class( $wp_customize, $this->args['settings'], $args ) );
 	}
 }
