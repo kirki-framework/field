@@ -194,7 +194,6 @@ abstract class Field {
 				$customizer->add_setting( new $classname( $customizer, $settings_id, $args ) );
 				return;
 			}
-			if ( 'option' === $args['type'] ) error_log( print_r( $args, true ) );
 			$customizer->add_setting( $setting_id, $args );
 		}
 	}
